@@ -27,12 +27,14 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="kukai" android:host="auth" />
             </intent-filter>
+        </activity>
 
-            <intent-filter android:label="Auth Redirect">
+        <activity android:name=".CustomTabsRedirectActivity" android:exported="true">
+            <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="myapp" android:host="auth" />
+                <data android:scheme="kukai" />
             </intent-filter>
         </activity>
     </application>
