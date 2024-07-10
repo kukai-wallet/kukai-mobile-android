@@ -37,6 +37,7 @@ android {
 
 dependencies {
     implementation("androidx.browser:browser:1.4.0")
+    implementation("org.torusresearch:web3auth-android-sdk:-SNAPSHOT")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
