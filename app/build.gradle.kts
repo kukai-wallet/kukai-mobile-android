@@ -33,11 +33,20 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+
+    configurations {
+        // Exclude bcprov-jdk15on module from all configurations
+        all {
+            exclude(group = "org.bouncycastle", module = "bcprov-jdk15on")
+        }
+    }
 }
 
 dependencies {
     implementation("androidx.browser:browser:1.4.0")
     implementation("org.torusresearch:web3auth-android-sdk:-SNAPSHOT")
+    implementation("org.bouncycastle:bcprov-jdk15on:1.68")
+    implementation("org.bitcoinj:bitcoinj-core:0.15.10")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

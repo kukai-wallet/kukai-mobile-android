@@ -9,20 +9,6 @@ import com.web3auth.core.Web3Auth
 import com.web3auth.core.types.Network
 import com.web3auth.core.types.*
 import android.view.ViewGroup
-//import org.web3j.crypto.Credentials
-//import org.web3j.crypto.Hash
-//import org.web3j.crypto.RawTransaction
-//import org.web3j.crypto.Sign
-//import org.web3j.crypto.TransactionEncoder
-//import org.web3j.protocol.Web3j
-//import org.web3j.protocol.core.DefaultBlockParameterName
-//import org.web3j.protocol.core.methods.response.EthChainId
-//import org.web3j.protocol.core.methods.response.EthGetBalance
-//import org.web3j.protocol.core.methods.response.EthGetTransactionCount
-//import org.web3j.protocol.core.methods.response.EthSendTransaction
-//import org.web3j.protocol.http.HttpService
-//import org.web3j.utils.Convert
-//import org.web3j.utils.Numeric
 import java.math.BigInteger
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.CompletableFuture
@@ -32,7 +18,7 @@ import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
 import androidx.browser.customtabs.CustomTabsIntent
 
-const val BASE_URL: String = "https://b850-109-54-39-42.ngrok-free.app"
+const val BASE_URL: String = "https://ghostnet.kukai.app"
 
 class MainActivity : AppCompatActivity() {
 
@@ -51,10 +37,10 @@ class MainActivity : AppCompatActivity() {
 
         loadInitialURL()
 
-        val loginButton: Button = findViewById(R.id.loginButton)
-        loginButton.setOnClickListener {
-            openWeb3Auth()
-        }
+//        val loginButton: Button = findViewById(R.id.loginButton)
+//        loginButton.setOnClickListener {
+//            openWeb3Auth()
+//        }
 
         web3Auth = Web3Auth(
             Web3AuthOptions(
@@ -93,10 +79,7 @@ class MainActivity : AppCompatActivity() {
 
         loginCompletableFuture.whenComplete { _, error ->
             if (error == null) {
-                // render logged in UI
-                println("PrivKey: " + web3Auth.getPrivkey())
-                println("ed25519PrivKey: " + web3Auth.getEd25519PrivKey())
-                println("Web3Auth UserInfo" + web3Auth.getUserInfo())
+                handleUserDataFromDeeplink()
             } else {
                 // render login error UI
             }
@@ -118,7 +101,8 @@ class MainActivity : AppCompatActivity() {
         webView.webViewClient = object : WebViewClient() {
             override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
                 if (url != null && url.contains("accounts.google.com")) {
-                    launchCustomTab("$BASE_URL?provider=google")
+//                    launchCustomTab("$BASE_URL?provider=google")
+                    openWeb3Auth()
                     return true
                 }
 //                if (url != null && !url.startsWith(BASE_URL) && (url.startsWith("http") || url.startsWith("https"))) {
@@ -193,7 +177,7 @@ class MainActivity : AppCompatActivity() {
 
                 val userData = data.getQueryParameter("userData")
 
-                handleUserDataFromDeeplink(userData)
+                handleUserDataFromDeeplink()
 
 //                val newUrl = replaceUri(data.toString())
 //                secondWebView?.loadUrl(newUrl)
@@ -202,14 +186,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun handleUserDataFromDeeplink(userData: String?) {
+    private fun handleUserDataFromDeeplink() {
+        println("PrivKey: " + web3Auth.getPrivkey())
+        println("ed25519PrivKey: " + web3Auth.getEd25519PrivKey())
+        println("Web3Auth UserInfo" + web3Auth.getUserInfo())
+
+        val userData = LocalStorageUtils.getLocalStorage(web3Auth.getPrivkey(), web3Auth.getUserInfo()!!)
         val script = """
-                const data = $userData
-                localStorage.setItem('kukai-wallet', JSON.stringify(data));
+                localStorage.setItem('kukai-wallet', JSON.stringify($userData));
                 localStorage.setItem('accepted-terms', '1');
         """.trimIndent()
-
-        println("deeplink::passing-data::$userData")
 
         webView.evaluateJavascript(script) { result ->
             println("JavaScript execution result: $result")
@@ -217,10 +203,5 @@ class MainActivity : AppCompatActivity() {
             HAS_LOADED = true
         }
     }
-
-//    private fun replaceUri(uri: String): String {
-//        return uri.replace("kukai://auth/", "$BASE_URL/serviceworker/redirect?tes")
-//    }
-
 }
 
